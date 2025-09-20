@@ -13,10 +13,8 @@ import {
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   query,
-  serverTimestamp,
   setDoc,
   where,
 } from "firebase/firestore";
@@ -147,35 +145,62 @@ const SignUp: React.FC = () => {
         url: "http://localhost:5173/authorize-email",
         handleCodeInApp: true,
       });
-      console.log(userInfo);
 
       await setDoc(doc(db, "users", userInfo.uid), {
         uid: userInfo.uid,
-        username: userData.username,
         email: userData.email,
-        avatar: null,
-        bio: null,
         emailVerified: false,
-        providers: ["password"],
-        blockedUsers: [],
-        friends: [],
-        status: "offline",
-        lastSeen: null,
-        createdAt: serverTimestamp(),
-        updatedAt: null,
-        settings: {
-          darkMode: false,
-          language: "en",
+
+        profile: {
+          username: userData.username,
+          displayName: userData.username.toLocaleLowerCase() || null,
+          photoUrl: "",
+          bio: "",
+          fullName: "",
         },
-        metadata: {
-          lastLoginIP: "",
-          signUpIP: ip,
-          device: userDevice,
-          webVersion: webVersion,
+
+        relations: {
+          friends: [],
+          blocked: [],
+        },
+
+        authProviders: {
+          provider: ["password"],
+          linkedAt: new Date().toISOString(),
+        },
+
+        settings: {
+          preferences: {
+            darkMode: false,
+            language: "en-us",
+          },
+          notifications: {
+            enabled: false,
+            push: false,
+          },
+          privacy: {
+            showStatus: true,
+            profileVisibilty: "public",
+          },
+        },
+
+        timeStamps: {
+          createdAt: new Date().toISOString(),
+          updatedAt: null,
+          lastSeen: null,
+        },
+
+        security: {
+          signUpIP: ip || null,
+          lastLoginIP: null,
+          userDevice: userDevice || null,
+          webVersion: webVersion || null,
         },
       });
 
-      useNavigation("/message", { state: { email: userData.email } });
+      useNavigation(`/message?email=${userData.email}`, {
+        state: { email: userData.email },
+      });
     } catch (error: any) {
       setMsg(error.message);
       setLoading(false);
@@ -191,40 +216,74 @@ const SignUp: React.FC = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const userInfo = result.user;
 
-      const userRef = doc(db, "users", userInfo.uid);
-      const isEmailExist = await getDoc(userRef);
+      const userCollection = collection(db, "users");
+
+      const emailQuery = query(
+        userCollection,
+        where("email", "==", userData.email)
+      );
+
+      const isEmailExist = await getDocs(emailQuery);
+
+      if (!isEmailExist.empty) {
+        setMsg("Email already exist");
+      }
 
       const ip = await fetch("https://api.ipify.org?format=json")
         .then((res) => res.json())
         .then((data) => data.ip);
 
-      if (!isEmailExist.exists()) {
-        await setDoc(userRef, {
-          uid: userInfo.uid,
-          username: userData.username,
-          email: userData.email,
-          avatar: null,
-          bio: null,
-          isVerified: false,
-          providers: ["google.com"],
-          blockedUsers: [],
+      await setDoc(doc(db, "users", userInfo.uid), {
+        uid: userInfo.uid,
+        email: userInfo.email,
+        emailVerified: userInfo.emailVerified,
+
+        profile: {
+          username: userInfo.displayName?.toLocaleLowerCase(),
+          displayName: userInfo.displayName?.toLowerCase() || null,
+          photoUrl: userInfo.photoURL,
+          bio: "",
+          fullName: "",
+        },
+
+        relations: {
           friends: [],
-          status: "offline",
-          lastSeen: null,
-          createdAt: serverTimestamp(),
-          updatedAt: null,
-          settings: {
+          blocked: [],
+        },
+
+        authProviders: {
+          provider: userInfo.providerData,
+          linkedAt: new Date().toISOString(),
+        },
+
+        settings: {
+          preferences: {
             darkMode: false,
-            language: "en",
+            language: "en-us",
           },
-          metadata: {
-            lastLoginIP: "",
-            signUpIP: ip,
-            device: userDevice,
-            webVersion: webVersion,
+          notifications: {
+            enabled: false,
+            push: false,
           },
-        });
-      }
+          privacy: {
+            showStatus: true,
+            profileVisibilty: "public",
+          },
+        },
+
+        timeStamps: {
+          createdAt: new Date().toISOString(),
+          updatedAt: null,
+          lastSeen: null,
+        },
+
+        security: {
+          signUpIP: ip || null,
+          lastLoginIP: null,
+          userDevice: userDevice || null,
+          webVersion: webVersion || null,
+        },
+      });
 
       navigate("/dashboard");
     } catch (error: any) {
