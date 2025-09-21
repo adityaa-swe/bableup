@@ -1,37 +1,72 @@
-import { onAuthStateChanged } from "firebase/auth";
-import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../services/config";
-import type { ReactNode } from "react";
-import type { User } from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import type { Profile } from "../types/userProfile";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../services/config";
 
-interface AuthContextType {
-  user: User | null;
+interface authType {
+  firebaseUser: User | null;
+  bableUpUser: Profile | null;
+  loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
+const AuthContext = createContext<authType>({
+  firebaseUser: null,
+  bableUpUser: null,
+  loading: true,
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [firebaseUser, setfirebaseUser] = useState<User | null>(null);
+  const [bableUpUser, setBableUpUser] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (uid: string) => {
+    try {
+      const useRef = doc(db, "users", uid);
+      const getUser = await getDoc(useRef);
+
+      if (!getUser.exists()) return null;
+      return getUser.data() as Profile;
+    } catch (error: any) {
+      console.log(error.message);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (user?.emailVerified) {
-        await user.reload();
-        setUser(user);
-      } else if(user) {
-        console.log("Go to Message");
+    const trackUser = onAuthStateChanged(auth, async (firebaseUser) => {
+      setLoading(true);
+
+      if (firebaseUser) {
+        if (firebaseUser.emailVerified) {
+          setfirebaseUser(firebaseUser);
+          const userProfile = await fetchProfile(firebaseUser.uid);
+          setBableUpUser(userProfile);
+          setLoading(false);
+          return;
+        } else {
+          console.log("Email Verification needed");
+          setLoading(false);
+          return;
+        }
       } else {
-        console.log("Login Please");
+        setLoading(false);
+        console.log("Login Needed");
+        return;
       }
-    });
-    return () => unsub();
+    })
+
+    return () => trackUser();
+
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
-  );
+  const Profile = useMemo(() => ({
+    firebaseUser, loading, bableUpUser
+  }), [firebaseUser, loading, bableUpUser]);
+
+  return <AuthContext.Provider value={Profile}>{children}</AuthContext.Provider>
+
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const BableUp = () => useContext(AuthContext);
