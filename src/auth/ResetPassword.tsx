@@ -1,8 +1,7 @@
 import React, { useRef, useState } from "react";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
-import LockResetOutlinedIcon from "@mui/icons-material/LockResetOutlined";
 import BtnLoader from "../components/BtnLoader";
 import { confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import { auth } from "../services/config";
 
 const ResetPassword: React.FC = () => {
@@ -51,6 +50,7 @@ const ResetPassword: React.FC = () => {
 
   const [cPassword, setCPassword] = useState("");
   const [isLoading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleConfirmInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCPassword(e.target.value);
@@ -78,10 +78,15 @@ const ResetPassword: React.FC = () => {
       await verifyPasswordResetCode(auth, oobCode);
       await confirmPasswordReset(auth, oobCode, userData.password);
 
-      setMsg("Password has been reset successfully - u will redirect to Login!")
+      setMsg(
+        "Password has been reset successfully - u will redirect to Login!"
+      );
 
-      
-    } catch (error:any) {
+      setInterval(() => {
+        navigate("/login");
+      }, 2000);
+      return;
+    } catch (error: any) {
       setMsg(error.message);
       setLoading(false);
       return;
@@ -100,21 +105,21 @@ const ResetPassword: React.FC = () => {
         </p>
       </div>
       <div id="wrapper" className="w-full flex flex-col gap-4">
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <LockOpenIcon />
+        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+          <span className="material-symbols-outlined">password_2</span>
           <input
             ref={passwordRef}
             type="password"
             name="password"
             id="password"
             placeholder="Your New Password...."
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
             value={userData.password}
             onChange={handleInput}
           />
         </span>
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <LockResetOutlinedIcon />
+        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+          <span className="material-symbols-outlined">password_2</span>
           <input
             type="password"
             ref={cpasswordRef}
@@ -123,7 +128,7 @@ const ResetPassword: React.FC = () => {
             value={cPassword}
             onChange={handleConfirmInput}
             placeholder="Confirm Password...."
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
           />
         </span>
         <span
@@ -139,13 +144,13 @@ const ResetPassword: React.FC = () => {
         {showMsg.length == 0 ? (
           ""
         ) : (
-          <div id="msg-wrapper" className="text-red-500 text-[15px]">
+          <div id="msg-wrapper" className="text-red-500">
             {showMsg}
           </div>
         )}
         {!isLoading ? (
           <button
-            className="bg-blue-900 text-white p-2 rounded-lg hover:bg-blue-950 cursor-pointer transition-all"
+            className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-700 cursor-pointer transition-all"
             onClick={sendData}
           >
             Update Password

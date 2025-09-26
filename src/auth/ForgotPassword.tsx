@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import { Link } from "react-router-dom";
 import BtnLoader from "../components/BtnLoader";
 import {
   fetchSignInMethodsForEmail,
@@ -35,7 +34,6 @@ const ForgotPassword: React.FC = () => {
   };
 
   const [isLoading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
 
   const sendData = async () => {
     setLoading(true);
@@ -61,13 +59,11 @@ const ForgotPassword: React.FC = () => {
         handleCodeInApp: true,
       });
 
-      navigate("/pass-message");
+      setMsg("Email has been sent, Checkout your inbox!");
+      setLoading(true);
       return;
     } catch (error: any) {
       setMsg(error.message);
-      setLoading(false);
-      return;
-    } finally {
       setLoading(false);
       return;
     }
@@ -86,8 +82,8 @@ const ForgotPassword: React.FC = () => {
           </p>
         </div>
         <div id="wrapper" className="w-full flex flex-col gap-4">
-          <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-            <MailOutlineIcon />
+          <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+            <span className="material-symbols-outlined">alternate_email</span>
             <input
               type="text"
               name="email"
@@ -95,32 +91,32 @@ const ForgotPassword: React.FC = () => {
               onChange={handleInput}
               id="email"
               placeholder="Your Registered Email...."
-              className="w-full outline-none"
+              className="w-full outline-none py-2"
             />
           </span>
           {showMsg.length == 0 ? (
             ""
           ) : (
-            <div id="msg-wrapper" className="text-red-500 text-[15px]">
+            <div id="msg-wrapper" className="text-red-500">
               {showMsg}
             </div>
           )}
           {!isLoading ? (
             <button
-              className="bg-blue-900 text-white p-2 rounded-lg hover:bg-blue-950 cursor-pointer transition-all"
+              className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-700 cursor-pointer transition-all"
               onClick={sendData}
             >
-              Get Started
+              Continue
             </button>
           ) : (
-            <button className="flex flex-row justify-center items-center gap-2 cursor-not-allowed bg-stone-800 p-2 rounded-lg text-white">
+            <button className="flex flex-row justify-center items-center gap-2 cursor-not-allowed bg-teal-900 p-2 rounded-lg text-white">
               <BtnLoader />
-              Wait a Minute..
+              Wait a Minute!
             </button>
           )}
           <p className="text-center text-[15px]">
             Don't have an account ?{" "}
-            <Link to="/signup" className="hover:underline text-blue-900">
+            <Link to="/signup" className="hover:underline text-teal-700">
               SignUp
             </Link>
           </p>

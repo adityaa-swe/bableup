@@ -1,11 +1,14 @@
 import React, { useRef, useState } from "react";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { Link, useNavigate } from "react-router-dom";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { auth, googleProvider } from "../services/config.ts";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, db, googleProvider } from "../services/config.ts";
+import {
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import BtnLoader from "../components/BtnLoader.tsx";
+import { doc, updateDoc } from "firebase/firestore";
+import getProfile from "./GetUserProfile.ts";
 
 const Login: React.FC = () => {
   const passwordRef = useRef<HTMLInputElement | null>(null);
@@ -77,17 +80,36 @@ const Login: React.FC = () => {
         userData.email,
         userData.password
       );
+
       const user = userInfo.user;
+      await user.reload();
 
-      if (!user.emailVerified) {
-        setMsg("Email is not verified!");
+      const getBableUp = await getProfile(user.uid);
+      console.log(getBableUp?.emailVerified);
+
+      if (!getBableUp?.emailVerified) {
+        await sendEmailVerification(user, {
+          url: "http://localhost:5173/auth-mail",
+          handleCodeInApp: true,
+        });
+
+        setMsg("Email is not verified, Redirecting to Verify Page");
         setLoading(false);
-        return null;
+        navigate("/mail-message", { state: { email: user.email } });
+        return;
+      } else {
+        const ip = await fetch("https://api.ipify.org?format=json")
+          .then((res) => res.json())
+          .then((data) => data.ip);
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          "security.lastLoginIP": ip,
+          "timeStamps.lastSeen": new Date(),
+        });
+
+        navigate("/app/inbox");
+        return;
       }
-
-      console.log(user);
-
-      navigate("/dashboard");
     } catch (error: any) {
       setLoading(false);
       setMsg(error.message);
@@ -102,9 +124,18 @@ const Login: React.FC = () => {
         setMsg("Something went wrong!");
         return;
       }
-      navigate("/dashboard");
+      const ip = await fetch("https://api.ipify.org?format=json")
+        .then((res) => res.json())
+        .then((data) => data.ip);
+      const userRef = doc(db, "users", result.user.uid);
+      await updateDoc(userRef, {
+        "security.lastLoginIP": ip,
+        "timeStamps.lastSeen": new Date(),
+      });
+      navigate("/app/inbox");
     } catch (error: any) {
       setMsg(error.message);
+      return;
     }
   };
 
@@ -114,41 +145,41 @@ const Login: React.FC = () => {
         id="head"
         className="flex flex-col gap-1 justify-center items-center text-center"
       >
-        <h2 className="text-2xl font-medium">Welcome Back!</h2>
+        <h2 className="text-2xl font-semibold">Welcome Back!</h2>
         <p className="text-stone-500">Jump back into the conversation.</p>
       </div>
       <div id="wrapper" className="w-full flex flex-col gap-4">
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <MailOutlineIcon />
+        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+          <span className="material-symbols-outlined">alternate_email</span>
           <input
             type="text"
             name="email"
             id="email"
             placeholder="Your Email...."
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
             value={userData.email}
             onChange={handleInput}
           />
         </span>
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <LockOpenIcon />
+        <span className="flex flex-row px-2 items-center border border-stone-200 rounded-lg gap-2">
+          <span className="material-symbols-outlined">password_2</span>
           <input
             type="text"
             ref={passwordRef}
             name="password"
             id="password"
             placeholder="Your Password...."
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
             value={userData.password}
             onChange={handleInput}
           />
-          <span onClick={togglePassword}>
-            <VisibilityIcon className="hover:cursor-pointer" />
+          <span className="flex cursor-pointer" onClick={togglePassword}>
+            <span className="material-symbols-outlined">visibility</span>
           </span>
         </span>
         <Link
           to="/forgot-password"
-          className="text-[15px] underline hover:text-blue-900"
+          className="text-[15px] text-teal-700 hover:underline"
         >
           Forgot Password ?
         </Link>
@@ -162,7 +193,7 @@ const Login: React.FC = () => {
 
         {!isLoading ? (
           <button
-            className="bg-blue-900 text-white p-2 rounded-lg hover:bg-blue-950 cursor-pointer transition-all"
+            className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-700 cursor-pointer transition-all"
             onClick={sendData}
           >
             Get Started
@@ -175,7 +206,7 @@ const Login: React.FC = () => {
         )}
         <p className="text-center text-[15px]">
           Don't have an account ?{" "}
-          <Link to="/signup" className="hover:underline text-blue-900">
+          <Link to="/" className="hover:underline text-teal-700">
             SignUp
           </Link>
         </p>
@@ -193,7 +224,7 @@ const Login: React.FC = () => {
         className="w-full flex flex-row gap-2 justify-center items-center"
       >
         <button
-          className="cursor-pointer rounded-lg bg-white border border-stone-200 hover:bg-stone-200 p-2 flex flex-row gap-2 w-full justify-center items-center"
+          className="cursor-pointer rounded-lg border border-stone-200 hover:bg-stone-200 p-2 flex flex-row gap-2 w-full justify-center items-center"
           onClick={handleGoogleLogin}
         >
           <img
@@ -204,17 +235,14 @@ const Login: React.FC = () => {
           <p>Continue with Google</p>
         </button>
       </div>
-      <div
-        id="terms"
-        className="text-[13px] text-center font-semibold text-stone-500"
-      >
+      <div id="terms" className="text-sm text-center text-stone-500">
         By continuing to use our services, you acknowledge that you have both
         read and agree to our{" "}
-        <Link to="" className="underline hover:text-blue-900">
+        <Link to="/terms" className="underline hover:text-teal-700">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link to="" className="underline hover:text-blue-900">
+        <Link to="/privacy-policy" className="underline hover:text-teal-700">
           Privacy Policy.
         </Link>
       </div>

@@ -1,9 +1,5 @@
 import React, { useRef, useState } from "react";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { Link, useNavigate } from "react-router-dom";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import { auth, googleProvider, db } from "../services/config.ts";
 import {
   createUserWithEmailAndPassword,
@@ -90,6 +86,9 @@ const SignUp: React.FC = () => {
 
   const webVersion = String(import.meta.env.VITE_WEBVERSION) || null;
 
+  const navigate = useNavigate();
+  const userDevice = navigator.userAgent;
+
   const sendData = async () => {
     try {
       setLoading(true);
@@ -142,7 +141,7 @@ const SignUp: React.FC = () => {
       const userInfo = signUpUser.user;
 
       await sendEmailVerification(userInfo, {
-        url: "http://localhost:5173/authorize-email",
+        url: "http://localhost:5173/auth-mail",
         handleCodeInApp: true,
       });
 
@@ -166,7 +165,7 @@ const SignUp: React.FC = () => {
 
         authProviders: {
           provider: ["password"],
-          linkedAt: new Date().toISOString(),
+          linkedAt: new Date(),
         },
 
         settings: {
@@ -180,12 +179,11 @@ const SignUp: React.FC = () => {
           },
           privacy: {
             showStatus: true,
-            profileVisibilty: "public",
           },
         },
 
         timeStamps: {
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
           updatedAt: null,
           lastSeen: null,
         },
@@ -198,7 +196,7 @@ const SignUp: React.FC = () => {
         },
       });
 
-      useNavigation(`/message?email=${userData.email}`, {
+      useNavigation(`/mail-message`, {
         state: { email: userData.email },
       });
     } catch (error: any) {
@@ -207,9 +205,6 @@ const SignUp: React.FC = () => {
       return;
     }
   };
-
-  const navigate = useNavigate();
-  const userDevice = navigator.userAgent;
 
   const handleGoogleSignUp = async () => {
     try {
@@ -252,8 +247,8 @@ const SignUp: React.FC = () => {
         },
 
         authProviders: {
-          provider: userInfo.providerData,
-          linkedAt: new Date().toISOString(),
+          provider: userInfo.providerId,
+          linkedAt: new Date(),
         },
 
         settings: {
@@ -267,12 +262,11 @@ const SignUp: React.FC = () => {
           },
           privacy: {
             showStatus: true,
-            profileVisibilty: "public",
           },
         },
 
         timeStamps: {
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
           updatedAt: null,
           lastSeen: null,
         },
@@ -285,9 +279,11 @@ const SignUp: React.FC = () => {
         },
       });
 
-      navigate("/dashboard");
+      navigate("/app/inbox");
+      return;
     } catch (error: any) {
       setMsg(error.message);
+      return;
     }
   };
 
@@ -297,26 +293,26 @@ const SignUp: React.FC = () => {
         id="head"
         className="flex flex-col gap-1 justify-center items-center text-center"
       >
-        <h2 className="text-2xl font-medium">SignUp to BableUp!</h2>
+        <h2 className="text-2xl font-semibold">SignUp to BableUp!</h2>
         <p className="text-stone-500">
           Create your account and start connecting instantly.
         </p>
       </div>
       <div id="wrapper" className="w-full flex flex-col gap-4">
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <MailOutlineIcon />
+        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+          <span className="material-symbols-outlined">alternate_email</span>
           <input
             type="text"
             name="email"
             id="email"
             placeholder="Your Email...."
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
             value={userData.email}
             onChange={handleInput}
           />
         </span>
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <AlternateEmailIcon />
+        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+          <span className="material-symbols-outlined">person</span>
           <input
             type="text"
             name="username"
@@ -324,11 +320,11 @@ const SignUp: React.FC = () => {
             placeholder="Your Username...."
             value={userData.username}
             onChange={handleInput}
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
           />
         </span>
-        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 py-2 px-2">
-          <LockOpenIcon />
+        <span className="flex flex-row items-center border border-stone-200 rounded-lg gap-2 px-2">
+          <span className="material-symbols-outlined">password_2</span>
           <input
             type="text"
             name="password"
@@ -337,22 +333,22 @@ const SignUp: React.FC = () => {
             value={userData.password}
             onChange={handleInput}
             placeholder="Your Password...."
-            className="w-full outline-none"
+            className="w-full outline-none py-2"
           />
-          <span onClick={togglePassword}>
-            <VisibilityIcon className="hover:cursor-pointer" />
+          <span onClick={togglePassword} className="flex">
+            <span className="material-symbols-outlined">visibility</span>
           </span>
         </span>
         {showMsg.length == 0 ? (
           ""
         ) : (
-          <div id="msg-wrapper" className="text-red-500 text-[15px]">
+          <div id="msg-wrapper" className="text-red-500">
             {showMsg}
           </div>
         )}
         {!isLoading ? (
           <button
-            className="bg-blue-900 text-white p-2 rounded-lg hover:bg-blue-950 cursor-pointer transition-all"
+            className="bg-teal-500 text-white p-2 rounded-lg hover:bg-teal-700 cursor-pointer transition-all"
             onClick={sendData}
           >
             Get Started
@@ -366,7 +362,7 @@ const SignUp: React.FC = () => {
 
         <p className="text-center text-[15px]">
           Have an account with BableUp ?{" "}
-          <Link to="/login" className="hover:underline text-blue-900">
+          <Link to="/login" className="hover:underline text-teal-700">
             Login
           </Link>
         </p>
@@ -384,7 +380,7 @@ const SignUp: React.FC = () => {
         className="w-full flex flex-row gap-2 justify-center items-center"
       >
         <button
-          className="cursor-pointer rounded-lg bg-white border border-stone-200 hover:bg-stone-200 p-2 flex flex-row gap-2 w-full justify-center items-center"
+          className="cursor-pointer rounded-lg border border-stone-200 hover:bg-stone-200 p-2 flex flex-row gap-2 w-full justify-center items-center"
           onClick={handleGoogleSignUp}
         >
           <img
@@ -395,17 +391,14 @@ const SignUp: React.FC = () => {
           <p>Continue with Google</p>
         </button>
       </div>
-      <div
-        id="terms"
-        className="text-[13px] text-center font-semibold text-stone-500"
-      >
+      <div id="terms" className="text-sm text-center text-stone-500">
         By continuing to use our services, you acknowledge that you have both
         read and agree to our{" "}
-        <Link to="" className="underline hover:text-blue-900">
+        <Link to="/terms" className="underline hover:text-teal-700">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link to="" className="underline hover:text-blue-900">
+        <Link to="/privacy-policy" className="underline hover:text-teal-700">
           Privacy Policy.
         </Link>
       </div>
