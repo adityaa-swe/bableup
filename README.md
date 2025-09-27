@@ -1,69 +1,39 @@
-# React + TypeScript + Vite
+# BableUp - Realtime chat platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Built **BableUp**, a secure real-time chat platform with React, Node.js, MongoDB, and Firebase, featuring Google/email authentication, real-time messaging via Socket.IO, and user profile management.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Secure authentication with Firebase supporting google login and email/password
 
-## Expanding the ESLint configuration
+- Real-time one-to-one messaging using Socket.IO with Node.js and Express
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- User profile management with search and blocking features
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Data persistence using MongoDB optimized for fast performance
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Highlights (BableUp)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Developed a real-time chat system capable of handling multiple concurrent users.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Ensured secure authentication and robust session management using Firebase token verification.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Designed a modular architecture separating frontend, backend, real-time communication, and user authentication for clarity and maintainability.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Enhanced performance and responsiveness through SPA principles and efficient state management.
+
+## Stack
+
+- Frontend: React with TypeScript, state management (Context API)
+
+- Backend: Node.js, Express, Socket.IO
+
+- Database: MongoDB (Mongoose)
+
+- Authentication: Firebase (google, email-password login)
+
+## Future Improvements
+
+- Add Group Chat & multi-media support
+
+- Implementing to end-to-end encryption
