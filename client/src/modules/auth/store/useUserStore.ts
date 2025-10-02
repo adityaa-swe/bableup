@@ -30,7 +30,7 @@ onAuthStateChanged(auth, async (firebaseUser) => {
 
     setTimeout(() => {
       signOut(auth);
-    }, 60 * 1000);
+    }, 60 * 60 * 1000);
   } else {
     set({ firebase: null, custom: null, loading: false });
     return;

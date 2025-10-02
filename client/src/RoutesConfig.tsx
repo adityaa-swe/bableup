@@ -12,7 +12,7 @@ import UserProfile from "./modules/chat/pages/UserProfile";
 
 const RoutesConfig = () => {
     return (
-        <div>
+        <>
             <Routes>
                 {/* Auth Routes */}
                 <Route path="/" element={<BlockRoutes><SignUp /></BlockRoutes>} />
@@ -26,7 +26,7 @@ const RoutesConfig = () => {
                 <Route path="/chat/:chatId" element={<ProtectedRoutes><Chat /></ProtectedRoutes>} />
                 <Route path="/profile" element={<ProtectedRoutes><UserProfile /></ProtectedRoutes>} />
             </Routes>
-        </div>
+        </>
     );
 };
 
