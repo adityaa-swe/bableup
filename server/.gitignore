@@ -2,3 +2,4 @@
 .env
 *.env
 bableup.json
+node_modules

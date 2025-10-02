@@ -1,13 +1,24 @@
-import admin from "firebase-admin";
-import fs from "fs";
+import admin from 'firebase-admin';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync(new URL("../key/bableup.json", import.meta.url))
-);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env'), quiet: true});
+
+const serviceAccount = {
+  projectId: process.env.PROJECT_ID,
+  clientEmail: process.env.CLIENT_EMAIL,
+  privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, "\n"),
+};
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
+
+
 
 export const authToken = async (idToken) => {
   try {
@@ -17,4 +28,4 @@ export const authToken = async (idToken) => {
     console.error(error);
     return null;
   }
-}
+};
