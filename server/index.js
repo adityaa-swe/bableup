@@ -11,7 +11,6 @@ import chatRoutes from "./routes/chatRoutes.js";
 import { Server } from "socket.io";
 import { initChatSocket } from "./socket/chatSocket.js";
 import { authUser } from "./middlewares/authUsers.js";
-import os from "os";
 
 dotenv.config({ quiet: true });
 
