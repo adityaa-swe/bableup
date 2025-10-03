@@ -18,8 +18,8 @@ const RoutesConfig = () => {
                 <Route path="/" element={<BlockRoutes><SignUp /></BlockRoutes>} />
                 <Route path="/login" element={<BlockRoutes><Login /></BlockRoutes>} />
                 <Route path="/forgot-password" element={<BlockRoutes><ForgotPassword /></BlockRoutes>} />
-                <Route path="/reset-password" element={<BlockRoutes><ResetPassword /></BlockRoutes>} />
-                <Route path="/auth-mail" element={<BlockRoutes><EmailVerification /></BlockRoutes>} />
+                <Route path="/reset-password" element={<BlockRoutes exception={["/reset-password"]}><ResetPassword /></BlockRoutes>} />
+                <Route path="/auth-mail" element={<BlockRoutes exception={["/auth-mail"]}><EmailVerification /></BlockRoutes>} />
 
                 {/* Chat Routes */}
                 <Route path="/inbox" element={<ProtectedRoutes><Inbox /></ProtectedRoutes>} />
