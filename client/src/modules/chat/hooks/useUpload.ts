@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import type React from "react";
 import { db } from "../../auth/config/configFirebase";
 
@@ -35,7 +35,7 @@ export const useUploadImage = async (file: File, userId: string) => {
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
       "profile.imageUrl": res.secure_url,
-      "timeStamps.updatedAt": new Date().toLocaleString(),
+      "timeStamps.updatedAt": serverTimestamp()
     });
 
     return {

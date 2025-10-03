@@ -212,6 +212,13 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  function formatDate(date: any): string {
+    if (!date) return "";
+    if (date instanceof Date) return date.toLocaleString();
+    if (date.toDate) return date.toDate().toLocaleString();
+    return "";
+  }
+
   return (
     <>
       {pageLoading ? (
@@ -393,18 +400,12 @@ const UserProfile: React.FC = () => {
                 <span className="flex flex-row gap-2">
                   <p>Last Login : </p>
                   <p>
-                    {userData.lastSeen instanceof Date
-                      ? userData.lastSeen.toLocaleString()
-                      : ""}
+                    {formatDate(userData.lastSeen)}
                   </p>
                 </span>
                 <span className="flex flex-row gap-2">
                   <p>Joined on : </p>
-                  <p>
-                    {userData.createdAt instanceof Date
-                      ? userData.createdAt.toLocaleString()
-                      : ""}
-                  </p>
+                  <p>{formatDate(userData.createdAt)}</p>
                 </span>
               </div>
             </div>
