@@ -53,7 +53,7 @@ const ResetPassword: React.FC = () => {
   };
 
   useEffect(() => {
-    let searchParams = new URLSearchParams();
+    let searchParams = new URLSearchParams(window.location.search);
     let oobCode = searchParams.get("oobCode");
     if (!oobCode) {
       navigate("/login");
@@ -69,7 +69,7 @@ const ResetPassword: React.FC = () => {
 
     setLoading(true);
     try {
-      let searchParams = new URLSearchParams();
+      let searchParams = new URLSearchParams(window.location.search);
       let oobCode = searchParams.get("oobCode");
       if (!oobCode) {
         setMsg("Unauthorized Access");

@@ -166,7 +166,8 @@ const Chat: React.FC = () => {
           </div>
           <div
             id="message-container"
-            className="flex-1 overflow-y-auto p-2 flex flex-col gap-2"
+            className="flex-1 overflow-y-auto p-2 flex flex-col gap-2 min-h-0"
+
           >
             {messages.map((msg, i) => {
               const isSender = msg.sender === currentUserId;
@@ -208,7 +209,7 @@ const Chat: React.FC = () => {
               You are Blocked by this user!
             </div>
           ) : (
-            <div className="p-2">
+            <div className="p-2 bottom-0 sticky bg-white">
               <div className="flex gap-2 items-center">
                 <input
                   type="text"
