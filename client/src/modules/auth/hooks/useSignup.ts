@@ -60,7 +60,7 @@ export const useSignupPassword = async (
     const firebaseUser = createUserInDB.user;
 
     await sendEmailVerification(firebaseUser, {
-      url: `${import.meta.env.VITE_WEB_URL}`,
+      url: `${import.meta.env.VITE_WEB_URL}/auth-mail`,
       handleCodeInApp: true,
     });
 
