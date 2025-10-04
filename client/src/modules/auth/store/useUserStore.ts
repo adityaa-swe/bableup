@@ -20,12 +20,20 @@ onAuthStateChanged(auth, async (firebaseUser) => {
   if (firebaseUser) {
     const userRef = doc(db, "users", firebaseUser?.uid);
     const snapShot = await getDoc(userRef);
-    if (snapShot.data()) {
+    const userData = snapShot.data();
+    if (!userData) {
+      set({ firebase: null, custom: null, loading: false });
+      return;
+    }
+    if (userData.isEmailVerified) {
       set({
         firebase: firebaseUser,
         custom: snapShot.data() as userProfile,
         loading: false,
       });
+    } else {
+      set({ firebase: null, custom: null, loading: false });
+      return;
     }
 
     setTimeout(() => {

@@ -4,7 +4,7 @@ import { Navigate, useLocation } from "react-router-dom";
 
 interface Props {
   children: JSX.Element;
-  exception?: string[];
+  exception: string[];
 }
 
 const BlockRoutes: React.FC<Props> = ({ children, exception = [] }) => {
@@ -15,7 +15,7 @@ const BlockRoutes: React.FC<Props> = ({ children, exception = [] }) => {
     return children;
   }
   
-  if (custom?.userId || firebase) {
+  if (custom?.isEmailVerified || firebase) {
     return <Navigate to="/inbox" replace />;
   }
 

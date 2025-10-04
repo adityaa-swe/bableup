@@ -88,7 +88,6 @@ const SignUp: React.FC = () => {
       if (signUpUser.success) {
         setMsg(signUpUser.message);
         setErr(false);
-        navigate("/inbox");
       } else {
         setMsg(signUpUser.message);
         setLoading(false);

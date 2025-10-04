@@ -157,14 +157,14 @@ const ResetPassword: React.FC = () => {
             onClick={userResetPassword}
             className="bg-teal-700 rounded-md text-white hover:bg-teal-900 cursor-pointer w-full p-2"
           >
-            Get Started
+            Confirm
           </button>
         ) : (
           <button
             className="p-2 text-white bg-black w-full rounded-md cursor-not-allowed flex flex-row items-center gap-2 justify-center"
             disabled
           >
-            <BtnLoading /> Creating account..
+            <BtnLoading /> Wait a sec..
           </button>
         )}
       </div>

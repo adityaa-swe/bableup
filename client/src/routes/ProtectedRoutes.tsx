@@ -9,7 +9,7 @@ interface Props {
 const ProtectedRoutes: React.FC<Props> = ({ children }) => {
   const { custom, firebase } = useUserStore();
 
-  if (!custom?.userId || !firebase) {
+  if (!custom?.isEmailVerified || !firebase) {
     return <Navigate to="/login" replace />;
   }
 
