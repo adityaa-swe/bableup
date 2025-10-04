@@ -40,19 +40,18 @@ export const getChats = async (req, res) => {
       members: { $all: [userId] },
     }).sort({ updatedAt: -1 });
 
-    if (chatExist.deletedFor?.includes(userId)) {
-      return res.status(400).json({ message: "Chat not found!" });
-    }
+    const filteredChats = chatExist.filter(
+      (chat) => !chat.deletedFor.includes(userId)
+    );
 
-    const isExistUser = chatExist.filter(chat => !chat.deletedFor.includes(userId));
-    if (isExistUser.length == 0) {
+    if (filteredChats.length == 0) {
       return res.status(400).json({
         message: "Chat does not exist!",
       });
     }
     res.setHeader("Cache-Control", "no-store");
-    return res.status(200).json(chatExist);
-
+    return res.status(200).json(filteredChats);
+    
   } catch (error) {
     return res.status(500).json({
       errMsg: "Internal Server Error",
