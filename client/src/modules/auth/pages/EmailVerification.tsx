@@ -8,12 +8,28 @@ const EmailVerification: React.FC = () => {
   const [showMsg, setMsg] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const searchParams = new URLSearchParams(window.location.search);
-  const oobCode = searchParams.get("oobCode");
-  const mode = searchParams.get("mode");
-  const userId = auth.currentUser?.uid;
   const navigate = useNavigate();
 
-  const authorizeEmail = async () => {
+  useEffect(() => {
+    const oobCode = searchParams.get("oobCode");
+    const mode = searchParams.get("mode");
+    const userId = auth.currentUser?.uid;
+    const authUser = async () => {
+      if (!oobCode || !userId || !mode) {
+        return;
+      }
+
+      await authorizeEmail(oobCode, userId, mode);
+    };
+
+    authUser();
+  }, []);
+
+  const authorizeEmail = async (
+    oobCode: string,
+    userId: string,
+    mode: string
+  ) => {
     setLoading(true);
 
     try {
@@ -26,7 +42,9 @@ const EmailVerification: React.FC = () => {
       if (authUser.success) {
         setMsg(authUser.message);
         setLoading(true);
-        navigate("/inbox");
+        setTimeout(() => {
+          navigate("/inbox");
+        }, 3000);
       } else {
         setMsg(authUser.message);
         setLoading(false);
@@ -39,14 +57,6 @@ const EmailVerification: React.FC = () => {
       return;
     }
   };
-
-  useEffect(() => {
-    const authUser = async () => {
-      await authorizeEmail();
-    };
-
-    authUser();
-  }, []);
 
   return (
     <div className="flex flex-col justify-center items-center my-24 gap-6 p-4">
