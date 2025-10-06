@@ -41,18 +41,16 @@ const Inbox: React.FC = () => {
       const serverChats = await getChats(userId, token);
 
       if (serverChats.success) {
-        let combinedChat: otherChat[] = [];
-        for (let i = 0; i < serverChats.chats.length; i++) {
-          let otherUserId =
-            userId == serverChats.chats[i].members[0]
-              ? serverChats.chats[i].members[1]
-              : serverChats.chats[i].members[0];
+        let combinedChat: otherChat[] = await Promise.all(
+          serverChats.chats.map(async (chat: any) => {
+            const otherUserId =
+              userId === chat.members[0] ? chat.members[1] : chat.members[0];
 
-          const saveChats = await getProfileChat(otherUserId);
-          const serverChat = serverChats.chats[i];
-          const mergeChat = { ...serverChat, ...saveChats };
-          combinedChat.push(mergeChat);
-        }
+            const savedChats = await getProfileChat(otherUserId);
+
+            return { ...chat, ...savedChats };
+          })
+        );
         setChats(combinedChat);
         sessionStorage.setItem("bableup", JSON.stringify(combinedChat));
         setLoading(false);
