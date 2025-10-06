@@ -39,25 +39,25 @@ const UserCard: React.FC<closeProfileType> = ({ closeProfile, userData }) => {
               <label htmlFor="name" className="font-bold">
                 Name :{" "}
               </label>
-              <p>{userData?.fullName || "Null"}</p>
+              <p>{userData?.fullName || "Not provided"}</p>
             </span>
             <span className="flex flex-row items-center gap-1">
               <label htmlFor="profile-name" className="font-bold">
                 Profile Name :{" "}
               </label>
-              <p>{userData?.displayName || "Null"}</p>
+              <p>{userData?.displayName || "Not provided"}</p>
             </span>
             <span className="flex flex-row items-center gap-1">
               <label htmlFor="bio" className="font-bold">
                 Bio :{" "}
               </label>
-              <p>{userData?.bio || "Null"}</p>
+              <p>{userData?.bio || "Not provided"}</p>
             </span>
             <span className="flex flex-row items-center gap-1">
               <label htmlFor="username" className="font-bold">
                 Username :{" "}
               </label>
-              <p>@{userData?.username || "Null"}</p>
+              <p>@{userData?.username || "Not provided"}</p>
             </span>
           </div>
         </div>

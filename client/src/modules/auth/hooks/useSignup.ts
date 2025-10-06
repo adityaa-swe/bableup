@@ -79,7 +79,7 @@ export const useSignupPassword = async (
         username: username.toLowerCase(),
         displayName: username.toLowerCase() || "Unknown User",
         imageUrl:
-          "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
+         "https://wallpapers.com/images/hd/placeholder-profile-icon-20tehfawxt5eihco.jpg",
         bio: "",
         fullName: "",
       },

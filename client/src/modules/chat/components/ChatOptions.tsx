@@ -59,7 +59,7 @@ const ChatOptions: React.FC<chatOptions> = ({
         sessionStorage.setItem("bableup", JSON.stringify(updateChat));
       }
 
-      window.location.reload();
+      window.history.back();
       return;
     } catch (error: any) {
       return;
