@@ -42,7 +42,11 @@ const Chat: React.FC = () => {
       }
 
       const serverUrl = import.meta.env.VITE_SERVER_URL;
-      const socketInstance = io(`${serverUrl}`, { auth: { token } });
+      const socketInstance = io("wss://bableup.onrender.com", {
+    auth: { token },
+    transports: ["websocket"], 
+    secure: true,              
+    });
 
       socketRef.current = socketInstance;
 
