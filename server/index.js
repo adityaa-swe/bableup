@@ -18,7 +18,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://bableup.vercel.app",
+    origin: "https://bableup-app.vercel.app",
     methods: ["GET", "POST"]
   }
 });
